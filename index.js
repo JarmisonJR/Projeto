@@ -1,170 +1,228 @@
-const turmasValidas = ["DS1", "DS2", "DS3", "MULTI1", "MULTI2", "MULTI3", "CTB1", "CTB2", "CTB3", "RDC1", "RDC2", "RDC3"];
-const slots = ["07:20 - 08:10", "08:10 - 09:00", "09:20 - 10:10", "10:10 - 11:00", "11:00 - 11:50", "12:00 - 13:00", "13:10 - 14:00", "14:00 - 14:50", "15:10 - 16:00", "16:00 - 16:50"];
-const cargosMonitoria = ["Fila (Álcool em Gel) Intervalo da Manhã", "Sucos - Intervalo do Almoço", "Fila (Álcool em Gel) - Intervalo do almoço", "Portaria - Intervalo do Almoço", "Fila - Intervalo da tarde"];
+// CONFIGURAÇÕES GERAIS
+const slots = [
+    "07:20 - 08:10", "08:10 - 09:00", "09:20 - 10:10", "10:10 - 11:00",
+    "11:00 - 11:50", "12:00 - 13:00", "13:10 - 14:00", "14:00 - 14:50",
+    "15:10 - 16:00", "16:00 - 16:50"
+];
+const postosMon = [
+    "Fila (Álcool em Gel) - Manhã",
+    "Sucos - Intervalo Almoço",
+    "Fila (Álcool em Gel) - Almoço",
+    "Portaria - Intervalo Almoço",
+    "Fila - Intervalo Tarde"
+];
+const excecoesNomes = ["da", "de", "do", "das", "dos", "e"];
 
 let currentLab = "Lab Informática";
-let usuarioLogado = null;
 
-// --- LOGIN E CADASTRO ---
+// --- FUNÇÃO DE PADRONIZAÇÃO DE NOMES ---
+function padronizarNome(str) {
+    if (!str) return "";
+    return str.toLowerCase().trim().split(' ').map(palavra => {
+        if (excecoesNomes.includes(palavra)) return palavra;
+        return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+    }).join(' ');
+}
+
+// --- SISTEMA DE LOGIN / CADASTRO ---
 function toggleAuth(type) {
-    document.getElementById('login-form').style.display = type === 'signup' ? 'none' : 'block';
-    document.getElementById('signup-form').style.display = type === 'signup' ? 'block' : 'none';
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    if (type === 'signup') {
+        loginForm.style.display = 'none';
+        signupForm.style.display = 'block';
+    } else {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+    }
 }
 
 function handleSignup() {
-    const nome = document.getElementById('reg-nome').value.trim();
-    const matricula = document.getElementById('reg-matricula').value.trim();
     const email = document.getElementById('reg-email').value.trim();
+    const nomeRaw = document.getElementById('reg-nome').value.trim();
     const pass = document.getElementById('reg-pass').value;
     const cargo = document.getElementById('reg-cargo').value;
 
-    if (!nome || !matricula || !email || pass.length < 6) {
-        return alert("Preencha todos os dados corretamente (Senha mín. 6 caracteres).");
-    }
+    if (!email.endsWith("@gmail.com")) return alert("Erro: Utilize um e-mail @gmail.com!");
+    if (!nomeRaw || pass.length < 4) return alert("Erro: Preencha todos os campos.");
 
-    const user = { nome, matricula, email, pass, cargo };
-    // CORRIGIDO: Uso de crases para Template Strings
-    localStorage.setItem(`user-${email}`, JSON.stringify(user));
-    alert("Cadastro concluído! Faça seu login.");
+    const nome = padronizarNome(nomeRaw);
+    localStorage.setItem(`user-${email}`, JSON.stringify({ nome, email, pass, cargo }));
+    alert("Conta criada com sucesso! Faça login.");
     toggleAuth('login');
 }
 
 function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-pass').value;
-    // CORRIGIDO: Uso de crases
-    const savedUser = JSON.parse(localStorage.getItem(`user-${email}`));
+    const user = JSON.parse(localStorage.getItem(`user-${email}`));
 
-    if (savedUser && savedUser.pass === pass) {
-        usuarioLogado = savedUser;
-        document.getElementById('auth-screen').classList.remove('active');
+    if (user && user.pass === pass) {
+        document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-content').style.display = 'block';
-        // CORRIGIDO: Uso de crases
-        document.getElementById('welcome-user').innerText = `Olá, ${savedUser.cargo} ${savedUser.nome.split(' ')[0]}!`;
+        document.getElementById('welcome-user').innerText = `Olá, ${user.nome}!`;
         showSection('menu');
     } else {
-        alert("Credenciais incorretas.");
+        alert("E-mail ou senha incorretos.");
     }
 }
 
-function logout() {
-    location.reload();
+function logout() { location.reload(); }
+
+// --- GERENCIAMENTO DE CADASTROS (PROFS/TURMAS/MONITORES) ---
+function cadastrarItem(tipo, inputId) {
+    const input = document.getElementById(inputId);
+    let valor = input.value.trim();
+    if (!valor) return;
+
+    valor = (tipo === 'turmas') ? valor.toUpperCase() : padronizarNome(valor);
+
+    let lista = JSON.parse(localStorage.getItem(tipo)) || [];
+    if (!lista.includes(valor)) {
+        lista.push(valor);
+        localStorage.setItem(tipo, JSON.stringify(lista));
+    }
+    input.value = "";
+    renderListasCadastros();
+}
+
+function renderListasCadastros() {
+    ['professores', 'turmas', 'monitores'].forEach(tipo => {
+        const el = document.getElementById(`list-${tipo}`);
+        const dados = JSON.parse(localStorage.getItem(tipo)) || [];
+        el.innerHTML = dados.map(i => `
+            <li>
+                <span>${i}</span>
+                <button onclick="removerItem('${tipo}','${i}')">Remover</button>
+            </li>`).join('');
+    });
+}
+
+function removerItem(tipo, item) {
+    let lista = JSON.parse(localStorage.getItem(tipo)).filter(i => i !== item);
+    localStorage.setItem(tipo, JSON.stringify(lista));
+    renderListasCadastros();
 }
 
 // --- NAVEGAÇÃO ---
 function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    if (id === 'menu') {
+    if(id === 'menu') {
         document.getElementById('main-menu').classList.add('active');
     } else {
-        // CORRIGIDO: Uso de crases
-        const target = document.getElementById(`sec-${id}`);
-        if (target) {
-            target.classList.add('active');
-            id === 'reservas' ? renderTable() : renderMonitoria();
-        }
+        document.getElementById(`sec-${id}`).classList.add('active');
+        if(id === 'cadastros') renderListasCadastros();
+        if(id === 'reservas') renderTable();
+        if(id === 'monitoria') renderMonitoria();
     }
 }
 
-// --- RESERVAS ---
 function changeLab(name) {
     currentLab = name;
     document.getElementById('currentLabTitle').innerText = name;
     renderTable();
 }
 
+// --- TABELA DE RESERVAS ---
 function renderTable() {
     const tbody = document.getElementById('tableBody');
-    const semEl = document.getElementById('semanaSelect');
-    const diaEl = document.getElementById('diaSelect');
-    if (!tbody || !semEl || !diaEl) return;
+    const sem = document.getElementById('semanaSelect').value;
+    const dia = document.getElementById('diaSelect').value;
+    const listaProfs = JSON.parse(localStorage.getItem('professores')) || [];
+    const listaTurmas = JSON.parse(localStorage.getItem('turmas')) || [];
 
-    const semana = semEl.value;
-    const dia = diaEl.value;
     tbody.innerHTML = '';
-
-    slots.forEach((slot, index) => {
+    slots.forEach((slot, i) => {
         const isLunch = slot === "12:00 - 13:00";
-        // CORRIGIDO: Uso de crases
-        const key = `reserva-${currentLab}-${semana}-${dia}-${slot}`;
-        const saved = JSON.parse(localStorage.getItem(key)) || { prof: '', turma: '' };
+        const key = `res-${currentLab}-${sem}-${dia}-${slot}`;
+        const data = JSON.parse(localStorage.getItem(key)) || { prof: '', turma: '' };
 
         const row = document.createElement('tr');
-        if (isLunch) row.classList.add('lunch-break');
-        if (saved.turma && !isLunch) row.classList.add('reserved-row');
+        if (isLunch) row.className = 'lunch-row';
+        if (data.turma && !isLunch) row.className = 'filled-row';
 
         row.innerHTML = `
-            <td><strong>${slot}</strong></td>
-            <td><input type="text" id="prof-${index}" value="${isLunch ? 'ALMOÇO' : saved.prof}" ${isLunch ? 'disabled' : ''}></td>
-            <td><input type="text" id="turma-${index}" value="${isLunch ? 'LIVRE' : saved.turma}" ${isLunch ? 'disabled' : ''}></td>
-            <td><button class="btn-save" onclick="saveBooking('${slot}', ${index})">Salvar</button></td>
+            <td class="time-cell">${slot}</td>
+            <td>
+                <select id="p-${i}" ${isLunch ? 'disabled' : ''}>
+                    <option value="">Selecione Professor</option>
+                    ${listaProfs.map(p => `<option value="${p}" ${data.prof === p ? 'selected' : ''}>${p}</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <select id="t-${i}" ${isLunch ? 'disabled' : ''}>
+                    <option value="">Selecione Turma</option>
+                    ${listaTurmas.map(t => `<option value="${t}" ${data.turma === t ? 'selected' : ''}>${t}</option>`).join('')}
+                </select>
+            </td>
+            <td><button class="btn-save-row" onclick="saveReserva('${slot}', ${i})">Gravar</button></td>
         `;
         tbody.appendChild(row);
     });
 }
 
-function saveBooking(slot, index) {
+function saveReserva(slot, i) {
     if (slot === "12:00 - 13:00") return;
-    const semana = document.getElementById('semanaSelect').value;
+    const sem = document.getElementById('semanaSelect').value;
     const dia = document.getElementById('diaSelect').value;
-    // CORRIGIDO: Uso de crases
-    const prof = document.getElementById(`prof-${index}`).value.trim();
-    const turma = document.getElementById(`turma-${index}`).value.trim().toUpperCase();
+    const prof = document.getElementById(`p-${i}`).value;
+    const turma = document.getElementById(`t-${i}`).value;
 
-    if (!prof || !turma) return alert("Erro: Preencha tudo.");
-    if (!turmasValidas.includes(turma)) return alert("Turma inválida!");
-
-    // CORRIGIDO: Uso de crases
-    localStorage.setItem(`reserva-${currentLab}-${semana}-${dia}-${slot}`, JSON.stringify({ prof, turma }));
-    alert("Reserva salva!");
+    localStorage.setItem(`res-${currentLab}-${sem}-${dia}-${slot}`, JSON.stringify({ prof, turma }));
     renderTable();
 }
 
-// --- MONITORIA ---
+// --- TABELA DE MONITORIA ---
 function renderMonitoria() {
     const tbody = document.getElementById('tableBodyMonitoria');
-    const semEl = document.getElementById('monSemanaSelect');
-    const diaEl = document.getElementById('monDiaSelect');
-    if (!tbody || !semEl || !diaEl) return;
+    const sem = document.getElementById('monSemanaSelect').value;
+    const dia = document.getElementById('monDiaSelect').value;
+    const listaMon = JSON.parse(localStorage.getItem('monitores')) || [];
+    const listaTurmas = JSON.parse(localStorage.getItem('turmas')) || [];
 
-    const semana = semEl.value;
-    const dia = diaEl.value;
     tbody.innerHTML = '';
+    postosMon.forEach((posto, i) => {
+        const key = `mon-S${sem}-${dia}-${posto}`;
+        const data = JSON.parse(localStorage.getItem(key)) || { nome: '', turma: '' };
 
-    cargosMonitoria.forEach((cargo, index) => {
-        // CORRIGIDO: Uso de crases
-        const key = `mon-S${semana}-${dia}-${cargo}`;
-        const saved = JSON.parse(localStorage.getItem(key)) || { nome: '', turma: '' };
         const row = document.createElement('tr');
+        if (data.nome) row.className = 'filled-row';
+
         row.innerHTML = `
-            <td><strong>${cargo}</strong></td>
-            <td><input type="text" id="mon-nome-${index}" value="${saved.nome}"></td>
-            <td><input type="text" id="mon-turma-${index}" value="${saved.turma}"></td>
-            <td><button class="btn-save" onclick="saveMonitoria('${cargo}', ${index})">Gravar</button></td>
+            <td><strong>${posto}</strong></td>
+            <td>
+                <select id="mn-${i}">
+                    <option value="">Selecione Monitor</option>
+                    ${listaMon.map(m => `<option value="${m}" ${data.nome === m ? 'selected' : ''}>${m}</option>`).join('')}
+                </select>
+            </td>
+            <td>
+                <select id="mt-${i}">
+                    <option value="">Selecione Turma</option>
+                    ${listaTurmas.map(t => `<option value="${t}" ${data.turma === t ? 'selected' : ''}>${t}</option>`).join('')}
+                </select>
+            </td>
+            <td><button class="btn-save-row" onclick="saveMon('${posto}', ${i})">Gravar</button></td>
         `;
         tbody.appendChild(row);
     });
 }
 
-function saveMonitoria(cargo, index) {
-    const semana = document.getElementById('monSemanaSelect').value;
+function saveMon(posto, i) {
+    const sem = document.getElementById('monSemanaSelect').value;
     const dia = document.getElementById('monDiaSelect').value;
-    // CORRIGIDO: Uso de crases
-    const nome = document.getElementById(`mon-nome-${index}`).value;
-    const turma = document.getElementById(`mon-turma-${index}`).value;
+    const nome = document.getElementById(`mn-${i}`).value;
+    const turma = document.getElementById(`mt-${i}`).value;
 
-    localStorage.setItem(`mon-S${semana}-${dia}-${cargo}`, JSON.stringify({ nome, turma }));
-    alert("Monitoria gravada!");
+    localStorage.setItem(`mon-S${sem}-${dia}-${posto}`, JSON.stringify({ nome, turma }));
+    renderMonitoria();
 }
 
-function checkAutoReset() {
-    if (new Date().getHours() >= 17) {
-        Object.keys(localStorage).forEach(key => { 
-            if (key.startsWith('reserva-')) localStorage.removeItem(key); 
-        });
-    }
-}
-
+// INICIALIZAÇÃO DE SELETORES
 window.onload = () => {
-    checkAutoReset();
+    const semSelectors = [document.getElementById('semanaSelect'), document.getElementById('monSemanaSelect')];
+    const diaSelectors = [document.getElementById('diaSelect'), document.getElementById('monDiaSelect')];
+    
+    [1,2,3,4].forEach(n => semSelectors.forEach(s => s.innerHTML += `<option value="${n}">Semana ${n}</option>`));
+    ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"].forEach(d => diaSelectors.forEach(s => s.innerHTML += `<option value="${d}">${d}</option>`));
 };
