@@ -3,168 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão Escolar | Oficial</title>
+    <title>Portal Gestão Escolar v3.0</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div id="auth-screen" class="section active">
-        <div class="auth-card">
-            <div id="login-form">
-                <div class="auth-header">
-                    <h1>Portal Escolar</h1>
-                    <p>Entre com seu e-mail @gmail.com</p>
+    <div id="auth-screen" class="auth-overlay active">
+        <div class="auth-box">
+            <div id="login-form" class="auth-content">
+                <div class="auth-brand">
+                    <div class="logo-icon">🌿</div>
+                    <h1>Bem-vindo</h1>
+                    <p>Acesse com seu e-mail institucional</p>
                 </div>
-                <div class="input-group">
-                    <input type="email" id="login-email" placeholder="E-mail">
-                    <input type="password" id="login-pass" placeholder="Senha">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="login-email" placeholder="nome@gmail.com">
                 </div>
-                <button class="btn-main" onclick="handleLogin()">Acessar Sistema</button>
-                <p class="auth-footer">Não tem uma conta? <a href="javascript:void(0)" onclick="toggleAuth('signup')">Cadastre-se aqui</a></p>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="login-pass" placeholder="••••••••">
+                </div>
+                <button class="btn-primary" onclick="handleLogin()">Entrar no Sistema</button>
+                <p class="auth-switch">Novo por aqui? <a href="javascript:void(0)" onclick="toggleAuth('signup')">Crie uma conta</a></p>
             </div>
 
-            <div id="signup-form" style="display: none;">
-                <div class="auth-header">
-                    <h1>Criar Conta</h1>
-                    <p>Preencha os dados institucionais</p>
+            <div id="signup-form" class="auth-content" style="display: none;">
+                <div class="auth-brand">
+                    <div class="logo-icon">✨</div>
+                    <h1>Cadastro</h1>
+                    <p>Use apenas e-mails @gmail.com</p>
                 </div>
-                <div class="input-group">
-                    <input type="text" id="reg-nome" placeholder="Nome Completo">
-                    <input type="email" id="reg-email" placeholder="E-mail @gmail.com">
-                    <input type="password" id="reg-pass" placeholder="Senha">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="reg-nome" placeholder="Ex: João da Silva">
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="reg-email" placeholder="seuemail@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="reg-pass" placeholder="Mínimo 4 caracteres">
+                </div>
+                <div class="form-group">
+                    <label>Cargo</label>
                     <select id="reg-cargo">
                         <option value="Professor">Professor(a)</option>
                         <option value="Coordenador">Coordenador(a)</option>
                     </select>
                 </div>
-                <button class="btn-main" onclick="handleSignup()">Finalizar Registro</button>
-                <p class="auth-footer">Já é cadastrado? <a href="javascript:void(0)" onclick="toggleAuth('login')">Voltar ao Login</a></p>
+                <button class="btn-primary" onclick="handleSignup()">Finalizar Cadastro</button>
+                <p class="auth-switch">Já tem conta? <a href="javascript:void(0)" onclick="toggleAuth('login')">Fazer Login</a></p>
             </div>
         </div>
     </div>
 
     <div id="app-content" style="display: none;">
         
-        <div id="main-menu" class="section">
-            <header class="app-header">
-                <h1 id="welcome-user">Olá, Usuário!</h1>
-                <button class="btn-logout" onclick="logout()">Sair</button>
-            </header>
+        <nav class="sidebar">
+            <div class="nav-header">Portal <span>Escolar</span></div>
+            <ul class="nav-links">
+                <li onclick="showSection('menu')">Menu Inicial</li>
+                <li onclick="showSection('cadastros')">Configurar Listas</li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </nav>
+
+        <main class="main-viewport">
             
-            <div class="menu-grid">
-                <div class="card-option" onclick="showSection('reservas')">
-                    <div class="icon-circle">🖥️</div>
-                    <h2>Laboratórios</h2>
-                    <p>Reserva de Informática, Hardware e Multimídia</p>
-                </div>
-                <div class="card-option" onclick="showSection('monitoria')">
-                    <div class="icon-circle">🤝</div>
-                    <h2>Monitoria</h2>
-                    <p>Escala de Postos e Alunos</p>
-                </div>
-                <div class="card-option" onclick="showSection('cadastros')">
-                    <div class="icon-circle">⚙️</div>
-                    <h2>Configurações</h2>
-                    <p>Cadastrar Professores, Turmas e Monitores</p>
-                </div>
-            </div>
-        </div>
-
-        <section id="sec-reservas" class="section">
-            <div class="top-bar">
-                <button class="btn-icon" onclick="showSection('menu')">← Menu</button>
-                <h2 class="section-title">Reserva de Laboratórios</h2>
-            </div>
-            
-            <div class="control-panel">
-                <div class="lab-group">
-                    <button class="btn-tab" id="btn-lab-inf" onclick="changeLab('Lab Informática')">🖥️ Informática</button>
-                    <button class="btn-tab" id="btn-lab-hard" onclick="changeLab('Lab Hardware')">⚙️ Hardware</button>
-                    <button class="btn-tab" id="btn-lab-multi" onclick="changeLab('Lab Multimídia')">🎬 Multimídia</button>
-                </div>
-                <div class="select-group">
-                    <select id="semanaSelect" onchange="renderTable()"></select>
-                    <select id="diaSelect" onchange="renderTable()"></select>
-                </div>
-            </div>
-
-            <div class="badge-title" id="currentLabTitle">Lab Informática</div>
-
-            <div class="glass-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Horário</th>
-                            <th>Professor</th>
-                            <th>Turma</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="sec-monitoria" class="section">
-            <div class="top-bar">
-                <button class="btn-icon" onclick="showSection('menu')">← Menu</button>
-                <h2 class="section-title">Escala de Monitoria</h2>
-            </div>
-            <div class="control-panel">
-                <select id="monSemanaSelect" onchange="renderMonitoria()"></select>
-                <select id="monDiaSelect" onchange="renderMonitoria()"></select>
-            </div>
-            <div class="glass-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Posto / Cargo</th>
-                            <th>Aluno Monitor</th>
-                            <th>Turma</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBodyMonitoria"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="sec-cadastros" class="section">
-            <div class="top-bar">
-                <button class="btn-icon" onclick="showSection('menu')">← Menu</button>
-                <h2 class="section-title">Gerenciamento de Dados</h2>
-            </div>
-            
-            <div class="cadastros-layout">
-                <div class="cad-card">
-                    <h3>👨‍🏫 Professores</h3>
-                    <div class="input-inline">
-                        <input type="text" id="new-prof" placeholder="Nome Completo">
-                        <button onclick="cadastrarItem('professores', 'new-prof')">Adicionar</button>
+            <div id="main-menu" class="app-section">
+                <header class="section-header">
+                    <h2 id="welcome-user">Olá!</h2>
+                    <p>Selecione uma área para gerenciar:</p>
+                </header>
+                
+                <div class="dashboard-grid">
+                    <div class="stat-card lab-card" onclick="openLab('Lab Informática (LEI)')">
+                        <h3>LEI</h3>
+                        <p>Lab. de Informática</p>
                     </div>
-                    <ul id="list-professores" class="scroll-list"></ul>
-                </div>
-
-                <div class="cad-card">
-                    <h3>👥 Turmas</h3>
-                    <div class="input-inline">
-                        <input type="text" id="new-turma" placeholder="Ex: DS1">
-                        <button onclick="cadastrarItem('turmas', 'new-turma')">Adicionar</button>
+                    <div class="stat-card lab-card" onclick="openLab('Lab Hardware')">
+                        <h3>Hardware</h3>
+                        <p>Manutenção e Redes</p>
                     </div>
-                    <ul id="list-turmas" class="scroll-list"></ul>
-                </div>
-
-                <div class="cad-card">
-                    <h3>🎓 Alunos Monitores</h3>
-                    <div class="input-inline">
-                        <input type="text" id="new-monitor" placeholder="Nome do Aluno">
-                        <button onclick="cadastrarItem('monitores', 'new-monitor')">Adicionar</button>
+                    <div class="stat-card lab-card" onclick="openLab('Lab Multimídia')">
+                        <h3>Multimídia</h3>
+                        <p>Audiovisual e Artes</p>
                     </div>
-                    <ul id="list-monitores" class="scroll-list"></ul>
+                    <div class="stat-card mon-card" onclick="showSection('monitoria')">
+                        <h3>Monitoria</h3>
+                        <p>Escala de Postos</p>
+                    </div>
                 </div>
             </div>
-        </section>
+
+            <div id="sec-reservas" class="app-section">
+                <div class="section-header">
+                    <button class="back-link" onclick="showSection('menu')">← Voltar ao Menu</button>
+                    <h2 id="currentLabTitle">Reserva de Laboratórios</h2>
+                </div>
+                
+                <div class="toolbar">
+                    <input type="date" id="datePickerReservas" min="2026-01-01" max="2026-12-31" onchange="renderTable()">
+                    <div id="calendar-info-res" class="calendar-badge">Selecione uma data</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Horário</th>
+                                <th>Professor</th>
+                                <th>Turma</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="sec-monitoria" class="app-section">
+                <div class="section-header">
+                    <button class="back-link" onclick="showSection('menu')">← Voltar ao Menu</button>
+                    <h2>Escala de Monitoria</h2>
+                </div>
+
+                <div class="toolbar">
+                    <input type="date" id="datePickerMonitoria" min="2026-01-01" max="2026-12-31" onchange="renderMonitoria()">
+                    <div id="calendar-info-mon" class="calendar-badge">Selecione uma data</div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Posto / Cargo</th>
+                                <th>Aluno Monitor</th>
+                                <th>Turma</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBodyMonitoria"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="sec-cadastros" class="app-section">
+                <div class="section-header">
+                    <button class="back-link" onclick="showSection('menu')">← Voltar ao Menu</button>
+                    <h2>Gestão de Listas</h2>
+                </div>
+                <div class="config-grid">
+                    <div class="config-card">
+                        <h3>👨‍🏫 Professores</h3>
+                        <div class="input-action">
+                            <input type="text" id="new-prof" placeholder="Nome Completo">
+                            <button onclick="cadastrarItem('professores', 'new-prof')">+</button>
+                        </div>
+                        <ul id="list-professores" class="data-list"></ul>
+                    </div>
+                    <div class="config-card">
+                        <h3>👥 Turmas</h3>
+                        <div class="input-action">
+                            <input type="text" id="new-turma" placeholder="Ex: DS1">
+                            <button onclick="cadastrarItem('turmas', 'new-turma')">+</button>
+                        </div>
+                        <ul id="list-turmas" class="data-list"></ul>
+                    </div>
+                    <div class="config-card">
+                        <h3>🎓 Monitores</h3>
+                        <div class="input-action">
+                            <input type="text" id="new-monitor" placeholder="Nome do Aluno">
+                            <button onclick="cadastrarItem('monitores', 'new-monitor')">+</button>
+                        </div>
+                        <ul id="list-monitores" class="data-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script src="script.js"></script>
