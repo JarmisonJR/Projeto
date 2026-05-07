@@ -1,5 +1,28 @@
-// --- ESTADO GLOBAL ---
-const nomeTecnico = "Jarmison"; 
+class Dashboard {
+    constructor() {
+        // Busca o nome salvo. Se não existir, usa "Técnico" como padrão.
+        this.usuarioNome = localStorage.getItem('SAD_USER_NAME') || "Técnico";
+        this.init();
+    }
+
+    init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.renderizarBoasVindas();
+            // Outras inicializações do sistema aqui...
+        });
+    }
+
+    renderizarBoasVindas() {
+        const welcomeElement = document.getElementById('welcome-text');
+        if (welcomeElement) {
+            // Insere o nome que veio do cadastro no seu <h1> ou <p>
+            welcomeElement.innerText = `Bem-vindo, Técnico ${this.usuarioNome}!`;
+        }
+    }
+}
+
+// Inicializa a Dashboard
+const appDashboard = new Dashboard();
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
