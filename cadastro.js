@@ -1,42 +1,39 @@
-const formCadastro = document.querySelector('form');
-
-formCadastro.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    // Pega o que foi digitado
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('password').value;
-
-    // Salva no banco de dados local do navegador
-    localStorage.setItem('emailCadastrado', email);
-    localStorage.setItem('senhaCadastrada', senha);
-
-    alert('Cadastro realizado! Agora faça login para entrar.');
-
-    // Retorna para a página de login
-    window.location.href = "index.html"; 
-});
 class Cadastro {
     constructor() {
-        this.form = document.getElementById('auth-form'); // Id do seu formulário
+        // Seleciona o formulário (use o ID ou a tag form)
+        this.form = document.querySelector('form'); 
         this.inputNome = document.getElementById('reg-nome');
+        this.inputEmail = document.getElementById('email');
+        this.inputSenha = document.getElementById('password');
         this.bindEvents();
     }
 
     bindEvents() {
         if (this.form) {
-            this.form.addEventListener('submit', () => this.salvarUsuario());
+            this.form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.salvarEContinuar();
+            });
         }
     }
 
-    salvarUsuario() {
-        const usuarioNome = this.inputNome.value;
-        if (nome) {
-            // Salva o nome no "banco de dados" do navegador
-            localStorage.setItem('SAD_USER_NAME', usuarioNome);
+    salvarEContinuar() {
+        const nome = this.inputNome.value;
+        const email = this.inputEmail.value;
+        const senha = this.inputSenha.value;
+
+        if (nome && email && senha) {
+            // Salva tudo no LocalStorage
+            localStorage.setItem('SAD_USER_NAME', nome);
+            localStorage.setItem('emailCadastrado', email);
+            localStorage.setItem('senhaCadastrada', senha);
+
+            alert('Cadastro realizado! Agora faça login para entrar.');
+            window.location.href = "index.html"; 
+        } else {
+            alert('Por favor, preencha todos os campos.');
         }
     }
 }
 
-// Inicializa a lógica de cadastro
 new Cadastro();
