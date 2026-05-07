@@ -28,7 +28,7 @@ const appDashboard = new Dashboard();
 document.addEventListener('DOMContentLoaded', () => {
     const welcomeText = document.getElementById('welcome-text');
     if (welcomeText) {
-        welcomeText.innerText = `Bem-vindo, Técnico ${nomeTecnico}!`;
+        welcomeText.innerText = `Bem-vindo, Técnico ${usuarioNome}!`;
     }
 
     showScreen('home-screen');
