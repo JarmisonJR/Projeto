@@ -1,7 +1,7 @@
 class Dashboard {
     constructor() {
         // Busca o nome salvo. Se não existir, usa "Técnico" como padrão.
-        this.usuarioNome = localStorage.getItem('SAD_USER_NAME') || "Técnico";
+        this.usuarioNome = localStorage.getItem('SAD_PRO_OS') || "Técnico";
         this.init();
     }
 
