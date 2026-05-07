@@ -33,7 +33,7 @@ class Cadastro {
         const nome = this.inputNome.value;
         if (nome) {
             // Salva o nome no "banco de dados" do navegador
-            localStorage.setItem('SAD_PRO_OS', nome);
+            localStorage.setItem('SAD_USER_NAME', nome);
         }
     }
 }
