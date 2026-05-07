@@ -153,7 +153,7 @@ function confirmarSair() {
     openConfirm(
         "Sair do Sistema?", 
         "Você tem certeza que deseja encerrar sua sessão atual?", 
-        () => window.location.href = 'login.html',
+        () => window.location.href = 'index.html',
         "Sair Agora"
     );
 }
