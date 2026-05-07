@@ -1,6 +1,6 @@
 class Dashboard {
     constructor() {
-        // Busca o nome salvo. Se não existir, usa "Técnico" como padrão.
+        // Busca o nome salvo ou define o padrão
         this.usuarioNome = localStorage.getItem('SAD_USER_NAME') || "Técnico";
         this.init();
     }
@@ -8,34 +8,26 @@ class Dashboard {
     init() {
         document.addEventListener('DOMContentLoaded', () => {
             this.renderizarBoasVindas();
-            // Outras inicializações do sistema aqui...
+            
+            // Inicializa as outras funções do seu sistema
+            showScreen('home-screen');
+            atualizarData();
+            updateStats();
+            aplicarTemaSalvo();
         });
     }
 
     renderizarBoasVindas() {
         const welcomeElement = document.getElementById('welcome-text');
         if (welcomeElement) {
-            // Insere o nome que veio do cadastro no seu <h1> ou <p>
+            // Usa o nome guardado na classe
             welcomeElement.innerText = `Bem-vindo, Técnico ${this.usuarioNome}!`;
         }
     }
 }
 
-// Inicializa a Dashboard
+// Inicia a classe Dashboard
 const appDashboard = new Dashboard();
-
-// --- INICIALIZAÇÃO ---
-document.addEventListener('DOMContentLoaded', () => {
-    const welcomeText = document.getElementById('welcome-text');
-    if (welcomeText) {
-        welcomeText.innerText = `Bem-vindo, Técnico ${usuarioNome}!`;
-    }
-
-    showScreen('home-screen');
-    atualizarData();
-    updateStats();
-    aplicarTemaSalvo();
-});
 
 // --- SISTEMA DE NAVEGAÇÃO ---
 function showScreen(id) {
@@ -60,8 +52,6 @@ function showScreen(id) {
 }
 
 // --- GESTÃO DE ORDENS (CRUD) ---
-
-// 1. Salvar Ordem (Corrigido para usar o Modal customizado)
 const serviceForm = document.getElementById('serviceForm');
 if (serviceForm) {
     serviceForm.addEventListener('submit', function(e) {
@@ -82,7 +72,6 @@ if (serviceForm) {
 
         this.reset();
         
-        // Modal de Sucesso (Estilo imagem_847d51.png)
         openConfirm(
             "Ordem Registrada", 
             "A ordem de serviço foi salva com sucesso! Deseja ver a lista agora?", 
@@ -92,7 +81,6 @@ if (serviceForm) {
     });
 }
 
-// 2. Renderizar Tabela
 function renderTable() {
     const tbody = document.getElementById('table-body');
     if (!tbody) return;
@@ -108,19 +96,16 @@ function renderTable() {
         <tr>
             <td>#${os.id}</td>
             <td><b>${os.cliente}</b></td>
-            <td>
-                ${os.aparelho}
-                <br><small style="color: #71717a;">${os.defeito}</small>
-            </td>
+            <td>${os.aparelho}<br><small style="color: #71717a;">${os.defeito}</small></td>
             <td>
                 <span class="status-badge ${os.status === 'Pendente' ? 'status-pendente' : 'status-concluido'}" 
                       onclick="toggleStatus(${os.id})" 
-                      style="cursor:pointer" title="Clique para alterar status">
+                      style="cursor:pointer">
                     ${os.status}
                 </span>
             </td>
             <td>
-                <button onclick="confirmarExclusao(${os.id})" class="btn-del" title="Excluir">
+                <button onclick="confirmarExclusao(${os.id})" class="btn-del">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -128,13 +113,10 @@ function renderTable() {
     `).join('');
 }
 
-// 3. Alternar Status
 function toggleStatus(id) {
     let osList = JSON.parse(localStorage.getItem('SAD_PRO_OS') || '[]');
     osList = osList.map(os => {
-        if (os.id == id) {
-            os.status = (os.status === 'Pendente') ? 'Concluído' : 'Pendente';
-        }
+        if (os.id == id) os.status = (os.status === 'Pendente') ? 'Concluído' : 'Pendente';
         return os;
     });
     localStorage.setItem('SAD_PRO_OS', JSON.stringify(osList));
@@ -142,59 +124,26 @@ function toggleStatus(id) {
     updateStats();
 }
 
-// 4. Confirmações de Exclusão e Banco (Usando o Sistema de Modal)
 function confirmarExclusao(id) {
-    openConfirm(
-        "Apagar Registro?", 
-        "Remover esta ordem permanentemente? Esta ação não pode ser desfeita.", 
-        () => {
-            let osList = JSON.parse(localStorage.getItem('SAD_PRO_OS') || '[]');
-            osList = osList.filter(os => os.id !== id);
-            localStorage.setItem('SAD_PRO_OS', JSON.stringify(osList));
-            renderTable();
-            updateStats();
-        },
-        "Confirmar"
-    );
+    openConfirm("Apagar Registro?", "Esta ação não pode ser desfeita.", () => {
+        let osList = JSON.parse(localStorage.getItem('SAD_PRO_OS') || '[]');
+        osList = osList.filter(os => os.id !== id);
+        localStorage.setItem('SAD_PRO_OS', JSON.stringify(osList));
+        renderTable();
+        updateStats();
+    }, "Confirmar");
 }
 
-function limparBanco() {
-    openConfirm(
-        "Esvaziar Banco?", 
-        "Isso apagará TODAS as ordens de serviço do sistema. Confirmar?", 
-        () => {
-            localStorage.removeItem('SAD_PRO_OS');
-            renderTable();
-            updateStats();
-        },
-        "Apagar Tudo"
-    );
-}
-
-// --- FUNÇÃO DE SAIR ---
-function confirmarSair() {
-    openConfirm(
-        "Sair do Sistema?", 
-        "Você tem certeza que deseja encerrar sua sessão atual?", 
-        () => window.location.href = 'index.html',
-        "Sair Agora"
-    );
-}
-
-// --- SISTEMA DE MODAL CUSTOMIZADO (Mestre) ---
 function openConfirm(titulo, msg, acao, textoBotao = "Confirmar") {
     const modal = document.getElementById('custom-confirm');
     const btnSim = document.getElementById('confirm-yes');
-    
     if(!modal || !btnSim) return;
 
     document.getElementById('confirm-title').innerText = titulo;
     document.getElementById('confirm-message').innerText = msg;
     btnSim.innerText = textoBotao;
-    
     modal.classList.remove('hidden');
 
-    // Remove eventos antigos clonando o botão
     const novoBtnSim = btnSim.cloneNode(true);
     btnSim.parentNode.replaceChild(novoBtnSim, btnSim);
 
@@ -208,8 +157,6 @@ function closeConfirm() {
     const modal = document.getElementById('custom-confirm');
     if (modal) modal.classList.add('hidden');
 }
-
-// --- UTILITÁRIOS ---
 
 function updateStats() {
     const osList = JSON.parse(localStorage.getItem('SAD_PRO_OS') || '[]');
@@ -236,24 +183,7 @@ function updateStats() {
 function atualizarData() {
     const el = document.getElementById('current-date');
     if (el) {
-        el.innerText = new Date().toLocaleDateString('pt-br', { 
-            weekday: 'long', day: 'numeric', month: 'long' 
-        });
-    }
-}
-
-function toggleTheme() {
-    const body = document.body;
-    const icon = document.getElementById('theme-icon');
-    
-    if (body.classList.contains('dark-theme')) {
-        body.classList.replace('dark-theme', 'light-theme');
-        if (icon) icon.classList.replace('fa-moon', 'fa-sun');
-        localStorage.setItem('SAD_PRO_THEME', 'light');
-    } else {
-        body.classList.replace('light-theme', 'dark-theme');
-        if (icon) icon.classList.replace('fa-sun', 'fa-moon');
-        localStorage.setItem('SAD_PRO_THEME', 'dark');
+        el.innerText = new Date().toLocaleDateString('pt-br', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 }
 
