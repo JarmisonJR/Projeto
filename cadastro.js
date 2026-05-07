@@ -30,10 +30,10 @@ class Cadastro {
     }
 
     salvarUsuario() {
-        const nome = this.inputNome.value;
+        const usuarioNome = this.inputNome.value;
         if (nome) {
             // Salva o nome no "banco de dados" do navegador
-            localStorage.setItem('SAD_USER_NAME', nome);
+            localStorage.setItem('SAD_USER_NAME', usuarioNome);
         }
     }
 }
