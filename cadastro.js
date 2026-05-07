@@ -1,9 +1,9 @@
 class CadastroManager {
     constructor() {
-        // Seleciona o formulário de cadastro
-        this.form = document.querySelector('form');
+        // 1. Seleciona o formulário de cadastro (tentando pelo ID ou pela tag form)
+        this.form = document.getElementById('auth-form') || document.querySelector('form');
         
-        // Seleciona os inputs (Certifique-se que os IDs no HTML são estes)
+        // 2. Seleciona os inputs do HTML
         this.inputNome = document.getElementById('reg-nome');
         this.inputEmail = document.getElementById('email');
         this.inputSenha = document.getElementById('password');
@@ -13,42 +13,52 @@ class CadastroManager {
 
     init() {
         if (this.form) {
+            // Adiciona o evento de submit usando Arrow Function para manter o contexto do "this"
             this.form.addEventListener('submit', (e) => this.executarFluxoCadastro(e));
         } else {
-            console.error("Formulário de cadastro não encontrado!");
+            console.error("Erro: Formulário de cadastro não encontrado no HTML!");
         }
     }
 
     executarFluxoCadastro(event) {
-        // 1. Impede o recarregamento padrão da página
+        // Impede o recarregamento da página
         event.preventDefault();
 
-        // 2. Captura os valores atuais
+        // Captura e limpa espaços extras dos valores
         const nome = this.inputNome.value.trim();
         const email = this.inputEmail.value.trim();
         const senha = this.inputSenha.value.trim();
 
-        // 3. Validação simples
+        // Validação: Verifica se algum campo está vazio
         if (nome === "" || email === "" || senha === "") {
-            alert("Por favor, preencha todos os campos para continuar.");
+            this.notificar("Por favor, preencha todos os campos para continuar.");
             return;
         }
 
-        // 4. Salva as informações no LocalStorage
-        // O nome que será usado no "Bem-vindo" da Dashboard
-        localStorage.setItem('SAD_USER_NAME', nome);
-        
-        // Credenciais para validar o login depois
-        localStorage.setItem('emailCadastrado', email);
-        localStorage.setItem('senhaCadastrada', senha);
+        try {
+            // SALVAMENTO NO LOCALSTORAGE
+            // Nome para o Banner da Dashboard
+            localStorage.setItem('SAD_USER_NAME', nome);
+            
+            // Credenciais para validação de Login
+            localStorage.setItem('emailCadastrado', email);
+            localStorage.setItem('senhaCadastrada', senha);
 
-        // 5. Feedback visual e redirecionamento
-        alert(`Conta criada com sucesso, ${nome}!`);
-        
-        // Envia o usuário para a página de login
-        window.location.href = "index.html"; 
+            // Sucesso e Redirecionamento
+            alert(`Conta criada com sucesso, Técnico ${nome}!`);
+            window.location.href = "index.html"; 
+
+        } catch (error) {
+            console.error("Erro ao salvar no LocalStorage:", error);
+            this.notificar("Erro ao salvar os dados. Verifique as permissões do seu navegador.");
+        }
+    }
+
+    notificar(mensagem) {
+        // Aqui você pode trocar por um modal customizado no futuro
+        alert(mensagem);
     }
 }
 
-// Inicializa a classe assim que o script carregar
-new CadastroManager();
+// Inicializa o sistema de cadastro
+const sistemaCadastro = new CadastroManager();
