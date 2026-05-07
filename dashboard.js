@@ -195,3 +195,15 @@ function aplicarTemaSalvo() {
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
     }
 }
+function confirmarSair() {
+    // Abre o seu modal customizado
+    openConfirm(
+        "Sair do Sistema", 
+        "Deseja realmente encerrar sua sessão atual?", 
+        () => {
+            // Esta é a ação executada ao clicar em "Sim, Confirmar"
+            // Substitua 'index.html' pelo nome da sua página de login ou destino
+            window.location.href = "index.html"; 
+        }
+    );
+}
