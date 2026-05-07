@@ -16,3 +16,27 @@ formCadastro.addEventListener('submit', (e) => {
     // Retorna para a página de login
     window.location.href = "index.html"; 
 });
+class Cadastro {
+    constructor() {
+        this.form = document.getElementById('auth-form'); // Id do seu formulário
+        this.inputNome = document.getElementById('reg-nome');
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        if (this.form) {
+            this.form.addEventListener('submit', () => this.salvarUsuario());
+        }
+    }
+
+    salvarUsuario() {
+        const nome = this.inputNome.value;
+        if (nome) {
+            // Salva o nome no "banco de dados" do navegador
+            localStorage.setItem('SAD_USER_NAME', nome);
+        }
+    }
+}
+
+// Inicializa a lógica de cadastro
+new Cadastro();
