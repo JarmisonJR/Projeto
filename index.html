@@ -1,189 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Gestão Escolar v3.0</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Login Page</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Forum&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="Captura de tela 2026-05-06 155442.png">
+    <link rel="stylesheet" href="login.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </head>
-<body>
 
-    <div id="auth-screen" class="auth-overlay active">
-        <div class="auth-box">
-            <div id="login-form" class="auth-content">
-                <div class="auth-brand">
-                    <div class="logo-icon">🌿</div>
-                    <h1>Bem-vindo</h1>
-                    <p>Acesse com seu e-mail institucional</p>
-                </div>
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="login-email" placeholder="nome@gmail.com">
-                </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="login-pass" placeholder="••••••••">
-                </div>
-                <button class="btn-primary" onclick="handleLogin()">Entrar no Sistema</button>
-                <p class="auth-switch">Novo por aqui? <a href="javascript:void(0)" onclick="toggleAuth('signup')">Crie uma conta</a></p>
-            </div>
-
-            <div id="signup-form" class="auth-content" style="display: none;">
-                <div class="auth-brand">
-                    <div class="logo-icon">✨</div>
-                    <h1>Cadastro</h1>
-                    <p>Use apenas e-mails @gmail.com</p>
-                </div>
-                <div class="form-group">
-                    <label>Nome Completo</label>
-                    <input type="text" id="reg-nome" placeholder="Ex: João da Silva">
-                </div>
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="reg-email" placeholder="seuemail@gmail.com">
-                </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="reg-pass" placeholder="Mínimo 4 caracteres">
-                </div>
-                <div class="form-group">
-                    <label>Cargo</label>
-                    <select id="reg-cargo">
-                        <option value="Professor">Professor(a)</option>
-                        <option value="Coordenador">Coordenador(a)</option>
-                    </select>
-                </div>
-                <button class="btn-primary" onclick="handleSignup()">Finalizar Cadastro</button>
-                <p class="auth-switch">Já tem conta? <a href="javascript:void(0)" onclick="toggleAuth('login')">Fazer Login</a></p>
-            </div>
-        </div>
-    </div>
-
-    <div id="app-content" style="display: none;">
-        
-        <nav class="sidebar">
-            <div class="nav-header">Portal <span>Escolar</span></div>
-            <ul class="nav-links">
-                <li onclick="showSection('menu')">Menu Inicial</li>
-                <li onclick="showSection('cadastros')">Configurar Listas</li>
-            </ul>
-            <button class="logout-btn" onclick="logout()">Sair</button>
-        </nav>
-
-        <main class="main-viewport">
-            
-            <div id="main-menu" class="app-section">
-                <header class="section-header">
-                    <h2 id="welcome-user">Olá!</h2>
-                    <p>Selecione uma área para gerenciar:</p>
-                </header>
+    <body>
+    <div class="container">
+        <section class="login-section">
+            <div class="login-box">
+                <h1>Faça seu <span>Login</span></h1>
                 
-                <div class="dashboard-grid">
-                    <div class="stat-card lab-card" onclick="openLab('Lab Informática (LEI)')">
-                        <h3>LEI</h3>
-                        <p>Lab. de Informática</p>
+                <form action="#">
+                    <div class="input-group">
+                        <label for="email"><i class="fa-regular fa-envelope"></i> Email</label>
+                        <input type="email" id="email" placeholder="Seu email" required>
                     </div>
-                    <div class="stat-card lab-card" onclick="openLab('Lab Hardware')">
-                        <h3>Hardware</h3>
-                        <p>Manutenção e Redes</p>
+
+                    <div class="input-group">
+                        <label for="password"><i class="fa-solid fa-lock"></i> Senha</label>
+                        <input type="password" id="password" placeholder="Sua senha" required>
                     </div>
-                    <div class="stat-card lab-card" onclick="openLab('Lab Multimídia')">
-                        <h3>Multimídia</h3>
-                        <p>Audiovisual e Artes</p>
-                    </div>
-                    <div class="stat-card mon-card" onclick="showSection('monitoria')">
-                        <h3>Monitoria</h3>
-                        <p>Escala de Postos</p>
-                    </div>
-                </div>
+
+                    <a href="#" class="forgot-password">Esqueci minha senha</a>
+
+                    <button type="submit" class="btn-login">ENTRAR</button>
+
+                   <a href="cadastro.html" class="signup-link">Ainda não tem uma conta? <span>Cadastre-se</span></a>
+                </form>
             </div>
+        </section>
 
-            <div id="sec-reservas" class="app-section">
-                <div class="section-header">
-                    <button class="back-link" onclick="showSection('menu')">← Voltar ao Menu</button>
-                    <h2 id="currentLabTitle">Reserva de Laboratórios</h2>
-                </div>
-                
-                <div class="toolbar">
-                    <input type="date" id="datePickerReservas" min="2026-01-01" max="2026-12-31" onchange="renderTable()">
-                    <div id="calendar-info-res" class="calendar-badge">Selecione uma data</div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Horário</th>
-                                <th>Professor</th>
-                                <th>Turma</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="sec-monitoria" class="app-section">
-                <div class="section-header">
-                    <button class="back-link" onclick="showSection('menu')">← Voltar ao Menu</button>
-                    <h2>Escala de Monitoria</h2>
-                </div>
-
-                <div class="toolbar">
-                    <input type="date" id="datePickerMonitoria" min="2026-01-01" max="2026-12-31" onchange="renderMonitoria()">
-                    <div id="calendar-info-mon" class="calendar-badge">Selecione uma data</div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Posto / Cargo</th>
-                                <th>Aluno Monitor</th>
-                                <th>Turma</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBodyMonitoria"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="sec-cadastros" class="app-section">
-                <div class="section-header">
-                    <button class="back-link" onclick="showSection('menu')">← Voltar ao Menu</button>
-                    <h2>Gestão de Listas</h2>
-                </div>
-                <div class="config-grid">
-                    <div class="config-card">
-                        <h3>👨‍🏫 Professores</h3>
-                        <div class="input-action">
-                            <input type="text" id="new-prof" placeholder="Nome Completo">
-                            <button onclick="cadastrarItem('professores', 'new-prof')">+</button>
-                        </div>
-                        <ul id="list-professores" class="data-list"></ul>
-                    </div>
-                    <div class="config-card">
-                        <h3>👥 Turmas</h3>
-                        <div class="input-action">
-                            <input type="text" id="new-turma" placeholder="Ex: DS1">
-                            <button onclick="cadastrarItem('turmas', 'new-turma')">+</button>
-                        </div>
-                        <ul id="list-turmas" class="data-list"></ul>
-                    </div>
-                    <div class="config-card">
-                        <h3>🎓 Monitores</h3>
-                        <div class="input-action">
-                            <input type="text" id="new-monitor" placeholder="Nome do Aluno">
-                            <button onclick="cadastrarItem('monitores', 'new-monitor')">+</button>
-                        </div>
-                        <ul id="list-monitores" class="data-list"></ul>
-                    </div>
-                </div>
-            </div>
-        </main>
+        <section class="image-section"></section>
+        <script src="login.js"></script>
     </div>
-
-    <script src="script.js"></script>
 </body>
-</html>
