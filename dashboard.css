@@ -393,9 +393,9 @@ button[onclick*="remove"] {
     justify-content: center;
     width: 100%;
 }
-/* Força o estilo do botão de confirmação dentro do modal */
-#confirm-yes, .btn-danger-confirm {
-    background: #ef4444 !important; /* Vermelho vibrante para alertar exclusão */
+/* Estilo para o botão Confirmar (Vermelho de Alerta) */
+#confirm-yes {
+    background: #ef4444 !important; /* Vermelho vibrante */
     color: white !important;
     border: none !important;
     padding: 12px 25px !important;
@@ -403,28 +403,38 @@ button[onclick*="remove"] {
     font-weight: bold !important;
     font-family: 'Inter', sans-serif !important;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.3s ease;
     min-width: 120px;
 }
 
 #confirm-yes:hover {
     background: #dc2626 !important;
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
 }
 
-/* Garante que o botão Cancelar também fique bonito */
-#confirm-no, .btn-secondary {
+/* Estilo para o botão Cancelar (Borda Sunset) */
+#confirm-no {
     background: transparent !important;
     color: white !important;
-    border: 1px solid var(--border-color) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     padding: 12px 25px !important;
     border-radius: 10px !important;
     cursor: pointer;
+    transition: 0.3s ease;
     min-width: 120px;
 }
 
 #confirm-no:hover {
     border-color: var(--primary-sunset) !important;
     color: var(--primary-sunset) !important;
+    background: rgba(255, 179, 138, 0.05) !important;
+}
+
+/* Centralização dos botões */
+.confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
 }
