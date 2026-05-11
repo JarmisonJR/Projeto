@@ -20,7 +20,6 @@ class Dashboard {
     renderizarBoasVindas() {
         const welcomeElement = document.getElementById('welcome-text');
         if (welcomeElement) {
-            // Usa o nome guardado na classe
             welcomeElement.innerText = `Bem-vindo, Técnico ${this.usuarioNome}!`;
         }
     }
@@ -48,6 +47,7 @@ function showScreen(id) {
     });
 
     if (id === 'lista-screen') renderTable();
+    if (id === 'estoque-screen') renderInventory();
     updateStats();
 }
 
@@ -133,20 +133,113 @@ function confirmarExclusao(id) {
         updateStats();
     }, "Confirmar");
 }
-// Função que abre o modal de confirmação
+
 function limparBanco() {
     openConfirm(
         "Limpar Todo o Banco?", 
         "Cuidado! Isso apagará permanentemente todas as suas Ordens de Serviço cadastradas.", 
         () => {
-            // Esta ação só roda se clicar em "Sim, Confirmar"
-            localStorage.removeItem('SAD_PRO_OS'); // Apaga as ordens
-            renderTable(); // Atualiza a tabela (vai ficar vazia)
-            updateStats(); // Zera os números do dashboard
+            localStorage.removeItem('SAD_PRO_OS');
+            renderTable();
+            updateStats();
         },
-        "Apagar Tudo" // Texto do botão de confirmação
+        "Apagar Tudo"
     );
 }
+
+// --- GESTÃO DE ESTOQUE (MODAL E TABELA) ---
+
+function abrirModalPeca() {
+    const modal = document.getElementById('modal-peca');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.getElementById('modal-stk-nome').focus();
+    }
+}
+
+function fecharModalPeca() {
+    document.getElementById('modal-peca').classList.add('hidden');
+    document.getElementById('pecaForm').reset();
+}
+
+function salvarPecaModal() {
+    const nome = document.getElementById('modal-stk-nome').value;
+    const qtd = parseInt(document.getElementById('modal-stk-qtd').value);
+    const preco = parseFloat(document.getElementById('modal-stk-preco').value);
+
+    const novaPeca = {
+        id: Date.now(),
+        nome,
+        categoria: "Geral",
+        qtd,
+        preco
+    };
+
+    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    estoque.push(novaPeca);
+    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+
+    fecharModalPeca();
+    renderInventory();
+    openConfirm("Sucesso", "Peça adicionada ao estoque!", null);
+}
+
+function renderInventory() {
+    const tbody = document.getElementById('inventory-table-body');
+    if (!tbody) return;
+
+    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    
+    if (estoque.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #71717a;">Nenhuma peça cadastrada.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(peca => `
+        <tr>
+            <td><b>${peca.nome}</b></td>
+            <td>${peca.categoria}</td>
+            <td>
+                <span class="status-badge ${peca.qtd <= 2 ? 'status-pendente' : 'status-concluido'}">
+                    ${peca.qtd} em estoque
+                </span>
+            </td>
+            <td style="color: #ffb38a;">R$ ${parseFloat(peca.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td style="display: flex; gap: 8px; align-items: center;">
+                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); width: 30px; height: 30px;">+</button>
+                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del" style="background: rgba(255, 255, 255, 0.05); color: #fff; width: 30px; height: 30px;">-</button>
+                <button onclick="confirmarExclusaoPeca(${peca.id})" class="btn-del" title="Excluir Peça">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function ajustarEstoque(id, mudanca) {
+    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    estoque = estoque.map(peca => {
+        if (peca.id === id) {
+            const novaQtd = parseInt(peca.qtd) + mudanca;
+            peca.qtd = novaQtd < 0 ? 0 : novaQtd;
+        }
+        return peca;
+    });
+    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+    renderInventory();
+}
+
+function confirmarExclusaoPeca(id) {
+    openConfirm("Excluir Peça?", "Deseja remover este item do estoque permanentemente?", () => {
+        let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+        estoque = estoque.filter(p => p.id !== id);
+        localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+        renderInventory();
+    });
+}
+
+// --- UTILITÁRIOS ---
+
 function openConfirm(titulo, msg, acao, textoBotao = "Confirmar") {
     const modal = document.getElementById('custom-confirm');
     const btnSim = document.getElementById('confirm-yes');
@@ -208,231 +301,11 @@ function aplicarTemaSalvo() {
         if (icon) icon.classList.replace('fa-moon', 'fa-sun');
     }
 }
+
 function confirmarSair() {
-    // Abre o seu modal customizado
     openConfirm(
         "Sair do Sistema", 
         "Deseja realmente encerrar sua sessão atual?", 
-        () => {
-            // Esta é a ação executada ao clicar em "Sim, Confirmar"
-            // Substitua 'index.html' pelo nome da sua página de login ou destino
-            window.location.href = "index.html"; 
-        }
+        () => { window.location.href = "index.html"; }
     );
-}
-// Abre o modal de cadastro
-function abrirModalPeca() {
-    const modal = document.getElementById('modal-estoque');
-    modal.classList.remove('hidden');
-    document.getElementById('stk-nome').focus();
-}
-
-// Fecha o modal de cadastro
-function fecharModalPeca() {
-    document.getElementById('modal-estoque').classList.add('hidden');
-    document.getElementById('stockForm').reset();
-}
-
-// Salva a nova peça no LocalStorage
-function salvarNovaPeca() {
-    const nome = document.getElementById('stk-nome').value;
-    const categoria = document.getElementById('stk-categoria').value;
-    const qtd = parseInt(document.getElementById('stk-qtd').value);
-    const preco = parseFloat(document.getElementById('stk-preco').value);
-
-    const novaPeca = {
-        id: Date.now(),
-        nome,
-        categoria,
-        qtd,
-        preco
-    };
-
-    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    estoque.push(novaPeca);
-    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-
-    fecharModalPeca();
-    renderInventory(); // Atualiza a tabela
-    
-    // Mostra um aviso de sucesso usando seu sistema de confirmação
-    openConfirm("Sucesso", "Peça adicionada ao estoque!", null, 'alert');
-}
-
-// Ajuste na função de renderização para garantir que os preços fiquem bonitos
-function renderInventory() {
-    const tbody = document.getElementById('inventory-table-body');
-    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    
-    if (estoque.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #71717a;">Nenhuma peça cadastrada.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = estoque.map(peca => `
-        <tr>
-            <td><b>${peca.nome}</b></td>
-            <td>${peca.categoria}</td>
-            <td>
-                <span class="status-badge ${peca.qtd <= 2 ? 'status-pendente' : 'status-concluido'}">
-                    ${peca.qtd} un.
-                </span>
-            </td>
-            <td style="color: #ffb38a;">R$ ${parseFloat(peca.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-            <td>
-                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); margin-right: 5px;">
-                    <i class="fas fa-plus"></i>
-                </button>
-                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-// --- GESTÃO DE ESTOQUE ---
-
-// Renderizar Tabela de Estoque
-function renderInventory() {
-    const tbody = document.getElementById('inventory-table-body');
-    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    
-    if (estoque.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhuma peça cadastrada.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = estoque.map(peca => `
-        <tr>
-            <td><b>${peca.nome}</b></td>
-            <td>${peca.categoria}</td>
-            <td>
-                <span class="stock-badge ${peca.qtd <= 2 ? 'stock-low' : 'stock-ok'}">
-                    ${peca.qtd} em estoque
-                </span>
-            </td>
-            <td>R$ ${parseFloat(peca.preco).toFixed(2)}</td>
-            <td>
-                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color:#10b981; border-color:#10b981;">+</button>
-                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del">-</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// --- GESTÃO DE ESTOQUE ---
-
-// Renderizar Tabela de Estoque
-function renderInventory() {
-    const tbody = document.getElementById('inventory-table-body');
-    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    
-    if (estoque.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhuma peça cadastrada.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = estoque.map(peca => `
-        <tr>
-            <td><b>${peca.nome}</b></td>
-            <td>${peca.categoria}</td>
-            <td>
-                <span class="stock-badge ${peca.qtd <= 2 ? 'stock-low' : 'stock-ok'}">
-                    ${peca.qtd} em estoque
-                </span>
-            </td>
-            <td>R$ ${parseFloat(peca.preco).toFixed(2)}</td>
-            <td>
-                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color:#10b981; border-color:#10b981;">+</button>
-                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del">-</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// Substitui o prompt antigo
-function abrirModalPeca() {
-    const modal = document.getElementById('modal-peca');
-    modal.classList.remove('hidden');
-    document.getElementById('modal-stk-nome').focus();
-}
-
-function fecharModalPeca() {
-    document.getElementById('modal-peca').classList.add('hidden');
-    document.getElementById('pecaForm').reset();
-}
-
-function salvarPecaModal() {
-    const nome = document.getElementById('modal-stk-nome').value;
-    const qtd = parseInt(document.getElementById('modal-stk-qtd').value);
-    const preco = parseFloat(document.getElementById('modal-stk-preco').value);
-
-    const novaPeca = {
-        id: Date.now(),
-        nome,
-        categoria: "Geral",
-        qtd,
-        preco
-    };
-
-    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    estoque.push(novaPeca);
-    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-
-    fecharModalPeca();
-    if (typeof renderInventory === "function") renderInventory(); // Atualiza a tabela se existir
-    
-    // Alerta de sucesso usando seu próprio sistema de confirmação
-    openConfirm("Sucesso", "Peça adicionada ao estoque!", null);
-}
-function renderInventory() {
-    const tbody = document.getElementById('inventory-table-body');
-    if (!tbody) return;
-
-    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    
-    if (estoque.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #71717a;">Nenhuma peça cadastrada.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = estoque.map(peca => `
-        <tr>
-            <td><b>${peca.nome}</b></td>
-            <td>${peca.categoria}</td>
-            <td>
-                <span class="status-badge ${peca.qtd <= 2 ? 'status-pendente' : 'status-concluido'}">
-                    ${peca.qtd} em estoque
-                </span>
-            </td>
-            <td style="color: #ffb38a;">R$ ${parseFloat(peca.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-            <td style="display: flex; gap: 8px; align-items: center;">
-               // Dentro do seu estoque.map(...)
-`
-<td style="display: flex; gap: 8px; align-items: center;">
-    <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); width: 30px; height: 30px;">+</button>
-    
-    <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del" style="background: rgba(255, 255, 255, 0.05); color: #fff; width: 30px; height: 30px;">-</button>
-    
-    <button onclick="confirmarExclusaoPeca(${peca.id})" class="btn-del" title="Excluir Peça">
-        <i class="fas fa-trash"></i>
-    </button>
-</td>
-`
-                <button onclick="confirmarExclusaoPeca(${peca.id})" class="btn-del" title="Excluir Peça">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// Função para confirmar e excluir a peça
-function confirmarExclusaoPeca(id) {
-    openConfirm("Excluir Peça?", "Deseja remover este item do estoque permanentemente?", () => {
-        let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-        estoque = estoque.filter(p => p.id !== id);
-        localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-        renderInventory(); // Recarrega a tabela
-    });
 }
