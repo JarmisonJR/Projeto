@@ -393,3 +393,38 @@ button[onclick*="remove"] {
     justify-content: center;
     width: 100%;
 }
+/* Força o estilo do botão de confirmação dentro do modal */
+#confirm-yes, .btn-danger-confirm {
+    background: #ef4444 !important; /* Vermelho vibrante para alertar exclusão */
+    color: white !important;
+    border: none !important;
+    padding: 12px 25px !important;
+    border-radius: 10px !important;
+    font-weight: bold !important;
+    font-family: 'Inter', sans-serif !important;
+    cursor: pointer;
+    transition: 0.3s;
+    min-width: 120px;
+}
+
+#confirm-yes:hover {
+    background: #dc2626 !important;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+/* Garante que o botão Cancelar também fique bonito */
+#confirm-no, .btn-secondary {
+    background: transparent !important;
+    color: white !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 12px 25px !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+#confirm-no:hover {
+    border-color: var(--primary-sunset) !important;
+    color: var(--primary-sunset) !important;
+}
