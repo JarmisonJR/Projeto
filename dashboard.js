@@ -407,9 +407,18 @@ function renderInventory() {
             </td>
             <td style="color: #ffb38a;">R$ ${parseFloat(peca.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
             <td style="display: flex; gap: 8px; align-items: center;">
-                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);">+</button>
-                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del" style="background: rgba(255, 255, 255, 0.05); color: #fff;">-</button>
-                
+               // Dentro do seu estoque.map(...)
+`
+<td style="display: flex; gap: 8px; align-items: center;">
+    <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); width: 30px; height: 30px;">+</button>
+    
+    <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del" style="background: rgba(255, 255, 255, 0.05); color: #fff; width: 30px; height: 30px;">-</button>
+    
+    <button onclick="confirmarExclusaoPeca(${peca.id})" class="btn-del" title="Excluir Peça">
+        <i class="fas fa-trash"></i>
+    </button>
+</td>
+`
                 <button onclick="confirmarExclusaoPeca(${peca.id})" class="btn-del" title="Excluir Peça">
                     <i class="fas fa-trash"></i>
                 </button>
