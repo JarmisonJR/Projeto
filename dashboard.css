@@ -451,3 +451,100 @@ td:last-child {
 .stat-card:nth-child(1):hover { box-shadow: 0 10px 30px rgba(21, 94, 99, 0.2); }
 .stat-card:nth-child(2):hover { box-shadow: 0 10px 30px rgba(255, 179, 138, 0.1); }
 .stat-card:nth-child(3):hover { box-shadow: 0 10px 30px rgba(239, 68, 68, 0.1); }
+/* --- MODAL DE ESTOQUE (CUSTOM) --- */
+
+/* O fundo escurecido que cobre a tela toda */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Preto profundo com transparência */
+    backdrop-filter: blur(8px);      /* Desfoque elegante do fundo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;                   /* Garante que fique por cima de tudo */
+    transition: 0.3s;
+}
+
+/* Esconde o modal quando tiver a classe .hidden */
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* O cartão do formulário dentro do modal */
+.modal-overlay .form-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 2.5rem;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+}
+
+/* Estilo do Cabeçalho do Modal */
+.form-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.form-header h2 {
+    font-family: 'Forum', serif;
+    color: var(--primary-sunset);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.form-header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Ajuste para o seletor (Select) de Categorias */
+#stk-categoria {
+    cursor: pointer;
+    appearance: none; /* Remove seta padrão */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ffb38a' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+}
+
+#stk-categoria option {
+    background-color: var(--bg-input);
+    color: white;
+}
+
+/* Animação de entrada (suave subida) */
+.animate-in {
+    animation: slideUpModal 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUpModal {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsividade para telas pequenas */
+@media (max-width: 480px) {
+    .modal-overlay .form-card {
+        padding: 1.5rem;
+        margin: 10px;
+    }
+    
+    .form-header h2 {
+        font-size: 1.5rem;
+    }
+}
+
