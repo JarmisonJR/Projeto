@@ -207,3 +207,73 @@ function confirmarSair() {
         }
     );
 }
+// Abre o modal de cadastro
+function abrirModalPeca() {
+    const modal = document.getElementById('modal-estoque');
+    modal.classList.remove('hidden');
+    document.getElementById('stk-nome').focus();
+}
+
+// Fecha o modal de cadastro
+function fecharModalPeca() {
+    document.getElementById('modal-estoque').classList.add('hidden');
+    document.getElementById('stockForm').reset();
+}
+
+// Salva a nova peça no LocalStorage
+function salvarNovaPeca() {
+    const nome = document.getElementById('stk-nome').value;
+    const categoria = document.getElementById('stk-categoria').value;
+    const qtd = parseInt(document.getElementById('stk-qtd').value);
+    const preco = parseFloat(document.getElementById('stk-preco').value);
+
+    const novaPeca = {
+        id: Date.now(),
+        nome,
+        categoria,
+        qtd,
+        preco
+    };
+
+    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    estoque.push(novaPeca);
+    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+
+    fecharModalPeca();
+    renderInventory(); // Atualiza a tabela
+    
+    // Mostra um aviso de sucesso usando seu sistema de confirmação
+    openConfirm("Sucesso", "Peça adicionada ao estoque!", null, 'alert');
+}
+
+// Ajuste na função de renderização para garantir que os preços fiquem bonitos
+function renderInventory() {
+    const tbody = document.getElementById('inventory-table-body');
+    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    
+    if (estoque.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #71717a;">Nenhuma peça cadastrada.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(peca => `
+        <tr>
+            <td><b>${peca.nome}</b></td>
+            <td>${peca.categoria}</td>
+            <td>
+                <span class="status-badge ${peca.qtd <= 2 ? 'status-pendente' : 'status-concluido'}">
+                    ${peca.qtd} un.
+                </span>
+            </td>
+            <td style="color: #ffb38a;">R$ ${parseFloat(peca.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td>
+                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); margin-right: 5px;">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
