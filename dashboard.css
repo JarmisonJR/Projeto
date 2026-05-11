@@ -452,3 +452,20 @@ td:last-child {
 .stat-card:nth-child(1):hover { box-shadow: 0 10px 30px rgba(21, 94, 99, 0.2); }
 .stat-card:nth-child(2):hover { box-shadow: 0 10px 30px rgba(255, 179, 138, 0.1); }
 .stat-card:nth-child(3):hover { box-shadow: 0 10px 30px rgba(239, 68, 68, 0.1); }
+/* Status de Estoque */
+.stock-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+.stock-low { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+.stock-ok { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; }
+
+/* Grid de peças no cadastro de OS */
+.inventory-select-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
