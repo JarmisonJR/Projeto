@@ -460,3 +460,16 @@ button[onclick*="remove"] {
 }
 /* Garante que o modal suma quando tiver a classe hidden */
 .hidden { display: none !important; }
+/* No seu arquivo CSS */
+#modal-peca .form-card {
+    padding: 45px !important; /* Aumenta o espaço interno */
+    gap: 25px !important;      /* Aumenta o espaço entre os blocos de input */
+}
+
+#modal-peca .input-group {
+    margin-bottom: 20px !important; /* Espaço maior entre as linhas */
+}
+
+#modal-peca .form-header {
+    margin-bottom: 30px !important;
+}
