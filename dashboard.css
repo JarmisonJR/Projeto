@@ -314,3 +314,82 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 0.85rem;
     font-style: italic;
 }
+/* Botões de Ação Principal */
+.btn-primary, 
+button[type="submit"], 
+#serviceForm button[type="submit"] {
+    background: linear-gradient(to right, var(--primary-teal), var(--primary-sunset)) !important;
+    color: var(--bg-black) !important;
+    border: none !important;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-family: 'Forum', serif;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Botões de Cancelar (Imagem 2) */
+.btn-secondary, 
+button[onclick*="close"], 
+button[onclick*="remove"] {
+    background: transparent !important;
+    color: var(--text-white) !important;
+    border: 1px solid var(--text-muted) !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary-sunset);
+    color: var(--primary-sunset);
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colunas iguais */
+    gap: 20px;
+    width: 100%;
+}
+
+.stat-card {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 25px !important;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Garante que o texto dentro do card não quebre de forma estranha */
+.stat-card h3 {
+    font-size: 1rem;
+    white-space: nowrap;
+    margin: 10px 0;
+}
+.confirm-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid var(--primary-sunset);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+}
