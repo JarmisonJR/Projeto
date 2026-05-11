@@ -350,12 +350,22 @@ function renderInventory() {
     `).join('');
 }
 
-// Função para Adicionar Peça (Via prompt ou novo modal)
+// Substitui o prompt antigo
 function abrirModalPeca() {
-    const nome = prompt("Nome da peça:");
-    if (!nome) return;
-    const qtd = parseInt(prompt("Quantidade inicial:"));
-    const preco = parseFloat(prompt("Preço de custo:"));
+    const modal = document.getElementById('modal-peca');
+    modal.classList.remove('hidden');
+    document.getElementById('modal-stk-nome').focus();
+}
+
+function fecharModalPeca() {
+    document.getElementById('modal-peca').classList.add('hidden');
+    document.getElementById('pecaForm').reset();
+}
+
+function salvarPecaModal() {
+    const nome = document.getElementById('modal-stk-nome').value;
+    const qtd = parseInt(document.getElementById('modal-stk-qtd').value);
+    const preco = parseFloat(document.getElementById('modal-stk-preco').value);
 
     const novaPeca = {
         id: Date.now(),
@@ -368,23 +378,10 @@ function abrirModalPeca() {
     let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
     estoque.push(novaPeca);
     localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-    renderInventory();
-}
 
-// Ajustar quantidade
-function ajustarEstoque(id, mudança) {
-    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    estoque = estoque.map(p => {
-        if (p.id === id) p.qtd = Math.max(0, p.qtd + mudança);
-        return p;
-    });
-    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-    renderInventory();
+    fecharModalPeca();
+    if (typeof renderInventory === "function") renderInventory(); // Atualiza a tabela se existir
+    
+    // Alerta de sucesso usando seu próprio sistema de confirmação
+    openConfirm("Sucesso", "Peça adicionada ao estoque!", null);
 }
-
-// Atualizar o showScreen para carregar o estoque
-const originalShowScreen = showScreen;
-showScreen = function(id) {
-    originalShowScreen(id);
-    if (id === 'estoque-screen') renderInventory();
-};
