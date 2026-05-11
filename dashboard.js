@@ -320,41 +320,45 @@ function renderInventory() {
     `).join('');
 }
 
-// Função para Adicionar Peça (Via prompt ou novo modal)
+// Abre o modal em vez do prompt
 function abrirModalPeca() {
-    const nome = prompt("Nome da peça:");
-    if (!nome) return;
-    const qtd = parseInt(prompt("Quantidade inicial:"));
-    const preco = parseFloat(prompt("Preço de custo:"));
+    const modal = document.getElementById('modal-estoque');
+    modal.classList.remove('hidden');
+    document.getElementById('stk-nome').focus();
+}
 
+// Fecha o modal
+function fecharModalPeca() {
+    document.getElementById('modal-estoque').classList.add('hidden');
+    document.getElementById('stockForm').reset();
+}
+
+// Escuta o envio do formulário do modal
+document.getElementById('stockForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const nome = document.getElementById('stk-nome').value;
+    const qtd = parseInt(document.getElementById('stk-qtd').value);
+    const preco = parseFloat(document.getElementById('stk-preco').value);
+
+    // Cria o objeto da peça
     const novaPeca = {
         id: Date.now(),
         nome,
-        categoria: "Geral",
+        categoria: "Geral", // Você pode adicionar um select de categoria se desejar
         qtd,
         preco
     };
 
+    // Salva no LocalStorage
     let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
     estoque.push(novaPeca);
     localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-    renderInventory();
-}
 
-// Ajustar quantidade
-function ajustarEstoque(id, mudança) {
-    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    estoque = estoque.map(p => {
-        if (p.id === id) p.qtd = Math.max(0, p.qtd + mudança);
-        return p;
-    });
-    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-    renderInventory();
-}
-
-// Atualizar o showScreen para carregar o estoque
-const originalShowScreen = showScreen;
-showScreen = function(id) {
+    // Fecha e limpa a tela
+    fecharModalPeca();
+    renderInventory(); // Chama a sua função que atualiza a tabela na tela
+});
     originalShowScreen(id);
     if (id === 'estoque-screen') renderInventory();
 };
