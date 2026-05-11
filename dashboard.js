@@ -320,36 +320,71 @@ function renderInventory() {
     `).join('');
 }
 
-// Abre o modal em vez do prompt
+// --- GESTÃO DE ESTOQUE ---
+
+// Renderizar Tabela de Estoque
+function renderInventory() {
+    const tbody = document.getElementById('inventory-table-body');
+    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    
+    if (estoque.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhuma peça cadastrada.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(peca => `
+        <tr>
+            <td><b>${peca.nome}</b></td>
+            <td>${peca.categoria}</td>
+            <td>
+                <span class="stock-badge ${peca.qtd <= 2 ? 'stock-low' : 'stock-ok'}">
+                    ${peca.qtd} em estoque
+                </span>
+            </td>
+            <td>R$ ${parseFloat(peca.preco).toFixed(2)}</td>
+            <td>
+                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color:#10b981; border-color:#10b981;">+</button>
+                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del">-</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Função para Adicionar Peça (Via prompt ou novo modal)
 function abrirModalPeca() {
-    const modal = document.getElementById('modal-estoque');
-    modal.classList.remove('hidden');
-    document.getElementById('stk-nome').focus();
-}
+    const nome = prompt("Nome da peça:");
+    if (!nome) return;
+    const qtd = parseInt(prompt("Quantidade inicial:"));
+    const preco = parseFloat(prompt("Preço de custo:"));
 
-function openConfirm(titulo, msg, acao, textoBotao = "Confirmar") {
-    const modal = document.getElementById('custom-confirm');
-    const btnSim = document.getElementById('confirm-yes');
-    if(!modal || !btnSim) return;
-
-    document.getElementById('confirm-title').innerText = titulo;
-    document.getElementById('confirm-message').innerText = msg;
-    
-    // Clonamos para limpar eventos antigos de cliques
-    const novoBtnSim = btnSim.cloneNode(true);
-    
-    // IMPORTANTE: Garantimos que o ID e o texto sejam aplicados ao novo elemento
-    novoBtnSim.id = "confirm-yes"; 
-    novoBtnSim.innerText = textoBotao;
-    
-    // Substitui o botão velho pelo novo no HTML
-    btnSim.parentNode.replaceChild(novoBtnSim, btnSim);
-
-    modal.classList.remove('hidden');
-
-    // Define a nova ação
-    novoBtnSim.onclick = () => {
-        if (acao) acao();
-        closeConfirm();
+    const novaPeca = {
+        id: Date.now(),
+        nome,
+        categoria: "Geral",
+        qtd,
+        preco
     };
+
+    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    estoque.push(novaPeca);
+    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+    renderInventory();
 }
+
+// Ajustar quantidade
+function ajustarEstoque(id, mudança) {
+    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    estoque = estoque.map(p => {
+        if (p.id === id) p.qtd = Math.max(0, p.qtd + mudança);
+        return p;
+    });
+    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+    renderInventory();
+}
+
+// Atualizar o showScreen para carregar o estoque
+const originalShowScreen = showScreen;
+showScreen = function(id) {
+    originalShowScreen(id);
+    if (id === 'estoque-screen') renderInventory();
+};
