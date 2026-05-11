@@ -327,38 +327,29 @@ function abrirModalPeca() {
     document.getElementById('stk-nome').focus();
 }
 
-// Fecha o modal
-function fecharModalPeca() {
-    document.getElementById('modal-estoque').classList.add('hidden');
-    document.getElementById('stockForm').reset();
-}
+function openConfirm(titulo, msg, acao, textoBotao = "Confirmar") {
+    const modal = document.getElementById('custom-confirm');
+    const btnSim = document.getElementById('confirm-yes');
+    if(!modal || !btnSim) return;
 
-// Escuta o envio do formulário do modal
-document.getElementById('stockForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+    document.getElementById('confirm-title').innerText = titulo;
+    document.getElementById('confirm-message').innerText = msg;
+    
+    // Clonamos para limpar eventos antigos de cliques
+    const novoBtnSim = btnSim.cloneNode(true);
+    
+    // IMPORTANTE: Garantimos que o ID e o texto sejam aplicados ao novo elemento
+    novoBtnSim.id = "confirm-yes"; 
+    novoBtnSim.innerText = textoBotao;
+    
+    // Substitui o botão velho pelo novo no HTML
+    btnSim.parentNode.replaceChild(novoBtnSim, btnSim);
 
-    const nome = document.getElementById('stk-nome').value;
-    const qtd = parseInt(document.getElementById('stk-qtd').value);
-    const preco = parseFloat(document.getElementById('stk-preco').value);
+    modal.classList.remove('hidden');
 
-    // Cria o objeto da peça
-    const novaPeca = {
-        id: Date.now(),
-        nome,
-        categoria: "Geral", // Você pode adicionar um select de categoria se desejar
-        qtd,
-        preco
+    // Define a nova ação
+    novoBtnSim.onclick = () => {
+        if (acao) acao();
+        closeConfirm();
     };
-
-    // Salva no LocalStorage
-    let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
-    estoque.push(novaPeca);
-    localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
-
-    // Fecha e limpa a tela
-    fecharModalPeca();
-    renderInventory(); // Chama a sua função que atualiza a tabela na tela
-});
-    originalShowScreen(id);
-    if (id === 'estoque-screen') renderInventory();
-};
+}
