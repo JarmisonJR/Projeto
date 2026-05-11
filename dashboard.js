@@ -133,7 +133,20 @@ function confirmarExclusao(id) {
         updateStats();
     }, "Confirmar");
 }
-
+// Função que abre o modal de confirmação
+function limparBanco() {
+    openConfirm(
+        "Limpar Todo o Banco?", 
+        "Cuidado! Isso apagará permanentemente todas as suas Ordens de Serviço cadastradas.", 
+        () => {
+            // Esta ação só roda se clicar em "Sim, Confirmar"
+            localStorage.removeItem('SAD_PRO_OS'); // Apaga as ordens
+            renderTable(); // Atualiza a tabela (vai ficar vazia)
+            updateStats(); // Zera os números do dashboard
+        },
+        "Apagar Tudo" // Texto do botão de confirmação
+    );
+}
 function openConfirm(titulo, msg, acao, textoBotao = "Confirmar") {
     const modal = document.getElementById('custom-confirm');
     const btnSim = document.getElementById('confirm-yes');
