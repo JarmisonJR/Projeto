@@ -385,3 +385,45 @@ function salvarPecaModal() {
     // Alerta de sucesso usando seu próprio sistema de confirmação
     openConfirm("Sucesso", "Peça adicionada ao estoque!", null);
 }
+function renderInventory() {
+    const tbody = document.getElementById('inventory-table-body');
+    if (!tbody) return;
+
+    const estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+    
+    if (estoque.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #71717a;">Nenhuma peça cadastrada.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(peca => `
+        <tr>
+            <td><b>${peca.nome}</b></td>
+            <td>${peca.categoria}</td>
+            <td>
+                <span class="status-badge ${peca.qtd <= 2 ? 'status-pendente' : 'status-concluido'}">
+                    ${peca.qtd} em estoque
+                </span>
+            </td>
+            <td style="color: #ffb38a;">R$ ${parseFloat(peca.preco).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td style="display: flex; gap: 8px; align-items: center;">
+                <button onclick="ajustarEstoque(${peca.id}, 1)" class="btn-del" style="color: #10b981; background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);">+</button>
+                <button onclick="ajustarEstoque(${peca.id}, -1)" class="btn-del" style="background: rgba(255, 255, 255, 0.05); color: #fff;">-</button>
+                
+                <button onclick="confirmarExclusaoPeca(${peca.id})" class="btn-del" title="Excluir Peça">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Função para confirmar e excluir a peça
+function confirmarExclusaoPeca(id) {
+    openConfirm("Excluir Peça?", "Deseja remover este item do estoque permanentemente?", () => {
+        let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
+        estoque = estoque.filter(p => p.id !== id);
+        localStorage.setItem('SAD_PRO_STOCK', JSON.stringify(estoque));
+        renderInventory(); // Recarrega a tabela
+    });
+}
