@@ -46,8 +46,10 @@ function showScreen(id) {
         }
     });
 
+    // Gatilhos de renderização automática ao trocar de tela
     if (id === 'lista-screen') renderTable();
     if (id === 'estoque-screen') renderInventory();
+    
     updateStats();
 }
 
@@ -158,8 +160,11 @@ function abrirModalPeca() {
 }
 
 function fecharModalPeca() {
-    document.getElementById('modal-peca').classList.add('hidden');
-    document.getElementById('pecaForm').reset();
+    const modal = document.getElementById('modal-peca');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.getElementById('pecaForm').reset();
+    }
 }
 
 function salvarPecaModal() {
@@ -220,7 +225,7 @@ function ajustarEstoque(id, mudanca) {
     let estoque = JSON.parse(localStorage.getItem('SAD_PRO_STOCK') || '[]');
     estoque = estoque.map(peca => {
         if (peca.id === id) {
-            const novaQtd = parseInt(peca.qtd) + mudanca;
+            const novaQtd = (parseInt(peca.qtd) || 0) + mudanca;
             peca.qtd = novaQtd < 0 ? 0 : novaQtd;
         }
         return peca;
