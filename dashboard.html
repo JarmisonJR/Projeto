@@ -131,6 +131,30 @@
                     </form>
                 </div>
             </section>
+            <section id="estoque-screen" class="content-section hidden">
+    <div class="section-header table-header-flex">
+        <h3>Gerenciamento de Peças</h3>
+        <button class="btn-primary" onclick="abrirModalPeca()">
+            <i class="fas fa-plus"></i> Adicionar Peça
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Peça</th>
+                    <th>Categoria</th>
+                    <th>Quantidade</th>
+                    <th>Preço Un.</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="inventory-table-body">
+                </tbody>
+        </table>
+    </div>
+</section>
         </main>
     </div>
 
